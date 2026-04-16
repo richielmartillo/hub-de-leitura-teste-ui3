@@ -1,61 +1,69 @@
 pipeline {
     agent any
-    tools {nodejs "nodejs"}
+
+    tools {
+        nodejs "nodejs"
+    }
 
     stages {
 
-        stage ("Clonar o hub de leitura integrado") {
+        stage("Clonar o hub de leitura integrado") {
             steps {
-                   bat '''
-                       if exist hub-de-leitura-integrado2 rmdir /s /q hub-de-leitura-integrado2
-                       git clone https://github.com/EBAC-QE/hub-de-leitura-integrado2.git
-
-                       '''
-             
+                bat '''
+                    if exist hub-de-leitura-integrado2 rmdir /s /q hub-de-leitura-integrado2
+                    git clone https://github.com/EBAC-QE/hub-de-leitura-integrado2.git
+                '''
             }
         }
 
-        stage ("Instalar dependencias do projeto") {
+        stage("Instalar dependencias e subir aplicacao") {
             steps {
-               dir('hub-de-leitura-integrado2') {
-                   bat '''
-                       call npm install
-                       start /B npm start
-                       '''              
-               }
+                dir('hub-de-leitura-integrado2') {
+                    bat '''
+                        call npm ci
+                        start /B npm start
+                    '''
+                }
             }
         }
 
-        stage ("Clonar o projeto de teste") {
+        stage("Clonar o projeto de teste") {
             steps {
-                   bat '''
-                       if exist hub-de-leitura-teste-ui2 rmdir /s /q hub-de-leitura-teste-ui2
-                       git clone https://github.com/EBAC-QE/hub-de-leitura-teste-ui2.git 
-                       ''' 
+                bat '''
+                    if exist hub-de-leitura-teste-ui2 rmdir /s /q hub-de-leitura-teste-ui2
+                    git clone https://github.com/EBAC-QE/hub-de-leitura-teste-ui2.git
+                '''
             }
         }
 
-        stage ("Instalar dependencias do projeto de teste") {
+        stage("Instalar dependencias do projeto de teste") {
             steps {
-               dir('hub-de-leitura-teste-ui2') {
-                   bat 'call npm install'
-               }
+                dir('hub-de-leitura-teste-ui2') {
+                    bat 'call npm ci'
+                }
             }
         }
 
-        stage('Executar os testes automatizados') {
+        stage("Esperar a aplicacao subir") {
             steps {
-               dir('hub-de-leitura-teste-ui2') {
-                   bat 'call npm test'
-               }
+                dir('hub-de-leitura-teste-ui2') {
+                    bat 'npx wait-on http://localhost:3000'
+                }
+            }
+        }
+
+        stage("Executar os testes automatizados") {
+            steps {
+                dir('hub-de-leitura-teste-ui2') {
+                    bat 'call npm test'
+                }
             }
         }
     }
 
-    post { 
+    post {
         always {
-                  bat 'taskkill /F /IM node.exe || exit 0'
+            bat 'taskkill /F /IM node.exe || exit 0'
         }
-        }
+    }
 }
-
