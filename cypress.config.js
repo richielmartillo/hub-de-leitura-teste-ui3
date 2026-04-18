@@ -10,7 +10,7 @@ module.exports = defineConfig({
       return config;
     },
     baseUrl: "http://localhost:3000/",
-    projectId: "5rckft",
+    projectId: "ujpp7t",
     video: true
   },
 });

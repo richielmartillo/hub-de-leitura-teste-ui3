@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx cypress run --browser chrome",
-    "cy:report": "npx cypress run --browser chrome --record --key 1ed3ef5e-c9c6-4959-ab41-cb80f3e0b889"
+    "cy:report": "npx cypress run --browser chrome --record --key 95d321c3-7c54-4696-b6ee-a9c2be1bcb81"
   },
   "repository": {
     "type": "git",
