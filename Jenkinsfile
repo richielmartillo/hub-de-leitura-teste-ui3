@@ -30,15 +30,15 @@ pipeline {
         stage("Clonar o projeto de teste") {
             steps {
                 bat '''
-                    if exist hub-de-leitura-teste-ui2 rmdir /s /q hub-de-leitura-teste-ui2
-                    git clone --depth 1 https://github.com/EBAC-QE/hub-de-leitura-teste-ui2.git
+                    if exist hub-de-leitura-teste-ui3 rmdir /s /q hub-de-leitura-teste-ui3
+                    git clone --depth 1 https://github.com/richielmartillo/hub-de-leitura-teste-ui3.git
                 '''
             }
         }
 
         stage("Instalar dependencias do projeto de teste") {
             steps {
-                dir('hub-de-leitura-teste-ui2') {
+                dir('hub-de-leitura-teste-ui3') {
                     bat 'call npm ci'
                 }
             }
@@ -46,7 +46,7 @@ pipeline {
 
         stage("Esperar a aplicacao subir") {
             steps {
-                dir('hub-de-leitura-teste-ui2') {
+                dir('hub-de-leitura-teste-ui3') {
                     bat 'npx wait-on http://localhost:3000'
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
 
         stage("Executar testes no Cypress Cloud") {
             steps {
-                dir('hub-de-leitura-teste-ui2') {
+                dir('hub-de-leitura-teste-ui3') {
                     withCredentials([string(credentialsId: 'cypress-record-key', variable: 'CYPRESS_RECORD_KEY')]) {
                         bat '''
                             npx cypress run ^
@@ -72,7 +72,7 @@ pipeline {
 
     post {
         always {
-            dir('hub-de-leitura-teste-ui2') {
+            dir('hub-de-leitura-teste-ui3') {
                 archiveArtifacts artifacts: 'cypress/screenshots/**/*.*,cypress/videos/**/*.*', allowEmptyArchive: true
                 allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
             }
@@ -84,4 +84,3 @@ pipeline {
         }
     }
 }
-
