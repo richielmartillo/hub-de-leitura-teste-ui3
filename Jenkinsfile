@@ -52,10 +52,19 @@ pipeline {
             }
         }
 
-        stage("Executar os testes automatizados") {
+        stage("Executar testes no Cypress Cloud") {
             steps {
                 dir('hub-de-leitura-teste-ui2') {
-                    bat 'call npm test'
+                    withCredentials([string(credentialsId: 'cypress-record-key', variable: 'CYPRESS_RECORD_KEY')]) {
+                        bat '''
+                            npx cypress run ^
+                            --record ^
+                            --key %CYPRESS_RECORD_KEY% ^
+                            --browser chrome ^
+                            --ci-build-id jenkins-%BUILD_NUMBER% ^
+                            --group "UI-Windows"
+                        '''
+                    }
                 }
             }
         }
