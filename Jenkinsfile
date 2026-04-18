@@ -69,7 +69,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             dir('hub-de-leitura-teste-ui2') {
@@ -84,3 +84,4 @@ pipeline {
         }
     }
 }
+
